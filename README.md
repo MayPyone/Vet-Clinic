@@ -57,11 +57,14 @@ To get a local copy up and running, follow these steps.
 ### Prerequisites
 
 In order to run this project you need:
-To install PostgreSQL
+PostgreSQL
 
 ### Setup
 
 Clone this repository to your desired folder:
+- Navigate to the location of the folder in your machine:
+
+**`you@your-Pc-name:~$ cd desktop`**
 
 <!-- AUTHORS -->
 
