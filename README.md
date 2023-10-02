@@ -1,13 +1,4 @@
 # Vet Clinic
-
-## Getting Started
-
-This repository includes files with plain SQL that can be used to recreate a database:
-
-- Use [schema.sql](./schema.sql) to create all tables.
-- Use [data.sql](./data.sql) to populate tables with sample data.
-- Check [queries.sql](./queries.sql) for examples of queries that can be run on a newly created database. **Important note: this file might include queries that make changes in the database (e.g., remove records). Use them responsibly!**
-
 <a name="readme-top"></a>
 
 <!-- TABLE OF CONTENTS -->
@@ -39,8 +30,6 @@ This repository includes files with plain SQL that can be used to recreate a dat
 ## 🛠 Built With <a name="built-with"></a>
 
 ### Tech Stack <a name="tech-stack"></a>
-
-<details>
 
 <details>
 <summary>Database</summary>
@@ -126,7 +115,7 @@ I would like to thank Microverse Team and all code reviewers.
 
 ## ❓ FAQ <a name="faq"></a>
 
-- **[What is sql]**
+- **[What is SQL?]**
 
   - [It's a structured query language to create and manipulate database.]
 
