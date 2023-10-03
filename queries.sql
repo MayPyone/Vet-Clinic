@@ -16,25 +16,41 @@ SELECT name,escape_attempts FROM animals WHERE weight_kg>10.5;
   /* all animals with a weight between 10.4kg and 17.3kg */
    SELECT * FROM animals WHERE weight_kg BETWEEN 10.4 AND 17.3;
 
+     
 
-
-
-
+    BEGIN TRANSACTION;
+    update animals set species = 'unspecified';
+    ROLLBACK;
+    
+    BEGIN TRANSACTION;
     update animals set species = 'digimon' where name LIKE '%mon%';
     update animals set species = 'pokemon' where species='';
+    select species from animals;
+    COMMIT;
+    select species from animals;
+
+    BEGIN TRANSACTION;
+    delete from animals;
+    select * from animals;
+    ROLLBACK;
+    select * from animals;
+
+    BEGIN TRANSACTION;
     delete from animals where date_of_birth > '2022-01-01';
-    /*  savepoint s1; */
+    savepoint s1;
     update animals set weight_kg = weight_kg * -1;
-    /* ROLLBACK to s1; */
+    ROLLBACK to s1;
     update animals set weight_kg = weight_kg * -1 where weight_kg<0;
-    /* commit; */
+    commit;
   
    /* total animals */
     select count(id) from animals;
     /* animals that have never tried to escape */
     select count(id) from animals where escape_attempts = 0;
     /* the average weight of animals */
-     select max(escape_attempts) from animals;
+    select avg(weight_kg) from animals;
+    /* escapes the most, neutered or not neutered animals? */
+     select avg(escape_attempts) from animals;
      select name, neutered from animals where escape_attempts = 7;
      /* The minimum and maximum weight of each type of animal */
      select species,min(weight_kg) from animals group by species;
