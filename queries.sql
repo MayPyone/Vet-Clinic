@@ -77,8 +77,8 @@ SELECT name,escape_attempts FROM animals WHERE weight_kg>10.5;
       on animals.species_id = species.id group by species.name;
     /* owner and animal */
       select owners.full_name, animals.name
-      from animals
-      join owners
+      from owners
+      left join animals
       on animals.owner_id = owners.id;
 
      /* all Digimon owned by Jennifer Orwell. */
