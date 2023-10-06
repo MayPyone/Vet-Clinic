@@ -57,3 +57,43 @@ SELECT name,escape_attempts FROM animals WHERE weight_kg>10.5;
      select species,max(weight_kg) from animals group by species;
      /* the average number of escape attempts per animal type of those born between 1990 and 2000 */
       select species,avg(escape_attempts) from animals where date_of_birth between '1990-01-01' and '2000-01-01'  group by species;
+
+    /* Melody Pond's */
+      select name,full_name
+      from animals
+      join owners
+      on animals.owner_id = owners.id where owners.full_name='Melody Pond';
+      
+      /* pokemon list */
+       select animals.name as animal , species.name as type
+       from animals
+       join species
+       on animals.species_id = species.id where species.name = 'Pokemon';
+
+    /* number of animals of per species */
+      select species.name, count(animals.id)
+      from animals
+      join species
+      on animals.species_id = species.id group by species.name;
+
+     /* all Digimon owned by Jennifer Orwell. */
+       select animals.name as animal, species.name as type, owners.full_name as owner
+       from species
+       join animals on animals.species_id = species.id
+       join owners on animals.owner_id = owners.id
+       where species.name = 'Digimon' and owners.full_name ='Jennifer Orwell'; 
+       select owners.full_name
+       from owners
+       join (
+       select owner_id, COUNT(*) as animal_count
+       from animals
+       group by owner_id
+      ) as owner_counts on owners.id = owner_counts.owner_id
+       where owner_counts.animal_count = (
+       select MAX(animal_count)
+       from (
+       select COUNT(*) AS animal_count
+       from animals
+       group by owner_id
+     ) as max_counts
+);
