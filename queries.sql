@@ -75,6 +75,11 @@ SELECT name,escape_attempts FROM animals WHERE weight_kg>10.5;
       from animals
       join species
       on animals.species_id = species.id group by species.name;
+    /* owner and animal */
+      select owners.full_name, animals.name
+      from animals
+      join owners
+      on animals.owner_id = owners.id;
 
      /* all Digimon owned by Jennifer Orwell. */
        select animals.name as animal, species.name as type, owners.full_name as owner
@@ -82,6 +87,15 @@ SELECT name,escape_attempts FROM animals WHERE weight_kg>10.5;
        join animals on animals.species_id = species.id
        join owners on animals.owner_id = owners.id
        where species.name = 'Digimon' and owners.full_name ='Jennifer Orwell'; 
+     
+     /*  */
+      select animals.name
+      from animals
+      join owners
+      on animals.owner_id = owners.id
+      where animals.escape_attempts=0 and owners.full_name = 'Dean Winchester';
+
+       /*Who owns the most animals? */
        select owners.full_name
        from owners
        join (
