@@ -112,62 +112,94 @@ SELECT name,escape_attempts FROM animals WHERE weight_kg>10.5;
      ) as max_counts
 );
 
+
 /* the last animal seen by William Tatcher */
-select animal_name,vets_name,date from visits
-where date = (select max(date) from visits where vets_name='William Tatcher');
+select animals.name from animals
+join visits
+on animals.id = visits.animal_id
+join vets
+on visits.vet_id = vets.id
+where vets.name='William Tatcher'
+order by visit_date desc
+limit 1;
 /* the number of animals Stephanie Mendez saw*/
- select count(animal_name) from visits where vets_name ='Stephanie Mendez';
+ select count(animal_id) from visits
+ join vets
+ on visits.vet_id = vets.id
+ where vets.name = 'Stephanie Mendez';
 
  /* vets and their specialties, including vets with no specialties.*/
-  select coalesce(vet_name,name),species_name
-  from specializations
-  full outer join vets
-  on vet_name = name;
+
+   select vets.name, species.name
+   from vets
+   full outer join specializations
+   on specializations.vet_id = vets.id
+   full outer join species
+   on specializations.species_id =  species.id;
 
 /*all animals that visited Stephanie Mendez between April 1st and August 30th, 2020. */
-  select animal_name from visits 
-  where vets_name = 'Stephanie Mendez' and date between ' 2020-04-01'
-  and ' 2020-08-30'
+ select animals.name join
+ from animals
+ join visits
+ on animals.id = visits.animal_id
+ join vets
+ on visits.vet_id = vets.id
+ where vets.name = 'Stephanie Mendez' and visit_date between ' 2020-04-01'
+ and ' 2020-08-30';
 /* animal that has the most visits to vets*/
-  select animal_name, COUNT(animal_name) as visit_count
-  from visits
-  group by animal_name
-  order by visit_count desc
-  limit 1;
+  select animals.name from animals
+ join visits
+ on animals.id=visits.animal_id
+ where visits.animal_id = (select max(animal_id) from visits)
+ group by animals.name;
 
 /*  Maisy Smith's first visit */
- select animal_name,date from visits
- where date = (select min(date) from visits where vets_name = 'Maisy Smith');
+ select animals.name from animals 
+ join visits on animals.id = visits.animal_id 
+ join vets 
+ on vets.id = visits.vet_id 
+ where vets.name= 'Maisy Smith' and visit_date = (select min(visit_date) from visits)
+ group by animals.name;
 
-
- select v.animal_name,a.escape_attempts,a. weight_kg,a.neutered,
- a.date_of_birth,species.name as type, o.full_name as owner,vets.name as vet, vets. date_of_graduation,vets.age, s.species_name as specialization, v.date as date_of_visit
- from owners o
- join animals a
+ /* most recent visit: animal information, vet information, and date of visit */
+ select a.name, a.escape_attempts,a. weight_kg,a.neutered,
+ a.date_of_birth,species.name as type, o.full_name as owner,
+ vets.name as vet, vets. date_of_graduation,vets.age, v.visit_date 
+ from animals a
+ join owners o
  on a.owner_id = o.id
  join species
  on species.id = a.species_id
  join visits v
- on a.name=v.animal_name
+ on a.id=v.animal_id
  join vets
- on vets.name = v.vets_name
+ on vets.id = v.vet_id
  join specializations s
- on vets.name = s.vet_name
- where v.date = (select max(date) from visits);
+ on vets.id = s.vet_id
+ where v.visit_date = (select max(visit_date) from visits)
+ limit 1;
 
-  select count (vets_name), vets_name from visits
-  where vets_name = (select name from vets
-  left join specializations s
-  on vets.name = s.vet_name
-  where species_name ='' or species_name is null)
-  group by vets_name;
 
-  select count (animal_name),animal_name from visits
-  where vets_name = 'Maisy Smith'
-  group by animal_name;
+/*How many visits were with a vet that did not specialize in that animal's species? */
 
-  select max(animal_count) OVER (), name  from (
-  select count (animal_name) as animal_count, animal_name as name from visits
-  where vets_name = 'Maisy Smith'
-  group by animal_name) as animalcounting
-  LIMIT 1;
+  select count(visits.animal_id),vets.name from visits
+  join vets on vets.id = visits.vet_id
+  left join specializations s on vets.id = s.vet_id
+  where s.vet_id is null or s.species_id is null
+  group by vets.name;
+  
+
+/* What specialty should Maisy Smith consider getting? Look for the species she gets the most.*/
+
+ select max_visit_count, name
+ from (
+  select count(*) as max_visit_count, species.name as name
+  from animals
+ join species on species.id = animals.species_id
+ join visits on visits.animal_id = animals.id
+ join vets on visits.vet_id = vets.id
+ where vets.name = 'Maisy Smith'
+ group by species.name
+order by max_visit_count DESC
+limit 1
+ ) as animalcounter;
