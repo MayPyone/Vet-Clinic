@@ -111,3 +111,63 @@ SELECT name,escape_attempts FROM animals WHERE weight_kg>10.5;
        group by owner_id
      ) as max_counts
 );
+
+/* the last animal seen by William Tatcher */
+select animal_name,vets_name,date from visits
+where date = (select max(date) from visits where vets_name='William Tatcher');
+/* the number of animals Stephanie Mendez saw*/
+ select count(animal_name) from visits where vets_name ='Stephanie Mendez';
+
+ /* vets and their specialties, including vets with no specialties.*/
+  select coalesce(vet_name,name),species_name
+  from specializations
+  full outer join vets
+  on vet_name = name;
+
+/*all animals that visited Stephanie Mendez between April 1st and August 30th, 2020. */
+  select animal_name from visits 
+  where vets_name = 'Stephanie Mendez' and date between ' 2020-04-01'
+  and ' 2020-08-30'
+/* animal that has the most visits to vets*/
+  select animal_name, COUNT(animal_name) as visit_count
+  from visits
+  group by animal_name
+  order by visit_count desc
+  limit 1;
+
+/*  Maisy Smith's first visit */
+ select animal_name,date from visits
+ where date = (select min(date) from visits where vets_name = 'Maisy Smith');
+
+
+ select v.animal_name,a.escape_attempts,a. weight_kg,a.neutered,
+ a.date_of_birth,species.name as type, o.full_name as owner,vets.name as vet, vets. date_of_graduation,vets.age, s.species_name as specialization, v.date as date_of_visit
+ from owners o
+ join animals a
+ on a.owner_id = o.id
+ join species
+ on species.id = a.species_id
+ join visits v
+ on a.name=v.animal_name
+ join vets
+ on vets.name = v.vets_name
+ join specializations s
+ on vets.name = s.vet_name
+ where v.date = (select max(date) from visits);
+
+  select count (vets_name), vets_name from visits
+  where vets_name = (select name from vets
+  left join specializations s
+  on vets.name = s.vet_name
+  where species_name ='' or species_name is null)
+  group by vets_name;
+
+  select count (animal_name),animal_name from visits
+  where vets_name = 'Maisy Smith'
+  group by animal_name;
+
+  select max(animal_count) OVER (), name  from (
+  select count (animal_name) as animal_count, animal_name as name from visits
+  where vets_name = 'Maisy Smith'
+  group by animal_name) as animalcounting
+  LIMIT 1;

@@ -35,3 +35,25 @@ create table owners(id SERIAL PRIMARY KEY,
   alter table animals
   add column owner_id int,
   add constraint fk_owner foreign key(owner_id) references owners(id);
+
+  create table vets (
+  id INT GENERATED ALWAYS AS IDENTITY,
+  name varchar (300),
+  age int,
+  date_of_graduation date,
+  primary key (id));
+
+  create table specializations (
+  specialization_id int generated always as identity,
+  vet_id int,
+  species_id int,
+  vet_name varchar(300),
+  species_name varchar(200),
+  constraint pk_specialization primary key(specialization_id),
+  constraint fk_vet foreign key(vet_id) references vets(id),
+  constraint fk_species foreign key (species_id) references species(id));
+
+  create table visits (
+  vets_name varchar(300),
+  animal_name varchar(200),
+  date date);
