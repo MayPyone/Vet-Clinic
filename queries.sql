@@ -111,3 +111,95 @@ SELECT name,escape_attempts FROM animals WHERE weight_kg>10.5;
        group by owner_id
      ) as max_counts
 );
+
+
+/* the last animal seen by William Tatcher */
+select animals.name from animals
+join visits
+on animals.id = visits.animal_id
+join vets
+on visits.vet_id = vets.id
+where vets.name='William Tatcher'
+order by visit_date desc
+limit 1;
+/* the number of animals Stephanie Mendez saw*/
+ select count(animal_id) from visits
+ join vets
+ on visits.vet_id = vets.id
+ where vets.name = 'Stephanie Mendez';
+
+ /* vets and their specialties, including vets with no specialties.*/
+
+   select vets.name, species.name
+   from vets
+   full outer join specializations
+   on specializations.vet_id = vets.id
+   full outer join species
+   on specializations.species_id =  species.id;
+
+/*all animals that visited Stephanie Mendez between April 1st and August 30th, 2020. */
+ select animals.name join
+ from animals
+ join visits
+ on animals.id = visits.animal_id
+ join vets
+ on visits.vet_id = vets.id
+ where vets.name = 'Stephanie Mendez' and visit_date between ' 2020-04-01'
+ and ' 2020-08-30';
+/* animal that has the most visits to vets*/
+  select animals.name from animals
+ join visits
+ on animals.id=visits.animal_id
+ where visits.animal_id = (select max(animal_id) from visits)
+ group by animals.name;
+
+/*  Maisy Smith's first visit */
+ select animals.name from animals 
+ join visits on animals.id = visits.animal_id 
+ join vets 
+ on vets.id = visits.vet_id 
+ where vets.name= 'Maisy Smith' and visit_date = (select min(visit_date) from visits)
+ group by animals.name;
+
+ /* most recent visit: animal information, vet information, and date of visit */
+ select a.name, a.escape_attempts,a. weight_kg,a.neutered,
+ a.date_of_birth,species.name as type, o.full_name as owner,
+ vets.name as vet, vets. date_of_graduation,vets.age, v.visit_date 
+ from animals a
+ join owners o
+ on a.owner_id = o.id
+ join species
+ on species.id = a.species_id
+ join visits v
+ on a.id=v.animal_id
+ join vets
+ on vets.id = v.vet_id
+ join specializations s
+ on vets.id = s.vet_id
+ where v.visit_date = (select max(visit_date) from visits)
+ limit 1;
+
+
+/*How many visits were with a vet that did not specialize in that animal's species? */
+
+  select count(visits.animal_id),vets.name from visits
+  join vets on vets.id = visits.vet_id
+  left join specializations s on vets.id = s.vet_id
+  where s.vet_id is null or s.species_id is null
+  group by vets.name;
+  
+
+/* What specialty should Maisy Smith consider getting? Look for the species she gets the most.*/
+
+ select max_visit_count, name
+ from (
+  select count(*) as max_visit_count, species.name as name
+  from animals
+ join species on species.id = animals.species_id
+ join visits on visits.animal_id = animals.id
+ join vets on visits.vet_id = vets.id
+ where vets.name = 'Maisy Smith'
+ group by species.name
+order by max_visit_count DESC
+limit 1
+ ) as animalcounter;
